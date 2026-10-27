@@ -1,0 +1,682 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="description" content="Every big movie and TV franchise in the order you should actually watch it, with Rotten Tomatoes scores and a catch-up tracker."><meta name="theme-color" content="#120405"><link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 22 30%22%3E%3Cpath d=%22M8 0h6v3H8z%22 fill=%22%23f3e7d3%22/%3E%3Cpath d=%22M7 3h8l1 3H6z%22 fill=%22%23f3e7d3%22 opacity=%22.7%22/%3E%3Cpath d=%22M6 6h10v3H6z%22 fill=%22%23f3e7d3%22/%3E%3Crect x=%224%22 y=%229%22 width=%2214%22 height=%2221%22 rx=%224%22 fill=%22%23e2262e%22/%3E%3Crect x=%226.5%22 y=%2215%22 width=%229%22 height=%228%22 rx=%221%22 fill=%22%23f3e7d3%22/%3E%3C/svg%3E"><style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}img{max-width:100%}[hidden]{display:none!important}</style></head><body><title>Catchup</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@500;700;900&family=Archivo:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap">
+<style>
+/* Layout: two views in one shell. Library = dense ledger of franchises with a "Tonight" lead.
+   Franchise = numbered poster wall with a sticky "Up next" action bar. Detail = bottom sheet.
+   Dark-first: a theater, not a dashboard. Ketchup red is the only accent; mustard marks "next". */
+:root{
+  --bg:#120405;
+  --surface:#1c0709;
+  --surface-2:#260a0d;
+  --line:rgba(246,233,214,.13);
+  --line-strong:rgba(246,233,214,.28);
+  --ink:#f3e7d3;
+  --muted:#b39c87;
+  --ketchup:#e2262e;
+  --ketchup-deep:#9d141b;
+  --mustard:#f2b705;
+  --mustard-ink:#1b0b0c;
+  --rotten:#8fc43f;
+  --shadow:0 18px 40px rgba(0,0,0,.5);
+  --display:'Big Shoulders Display','Oswald','Arial Narrow',sans-serif;
+  --body:'Archivo','Helvetica Neue',Arial,sans-serif;
+  color-scheme:dark;
+}
+@media (prefers-color-scheme:light){:root:not([data-theme="dark"]){
+  --bg:#f3ead9;--surface:#ebe0cb;--surface-2:#e2d5bc;--line:rgba(27,11,12,.14);--line-strong:rgba(27,11,12,.3);
+  --ink:#1b0b0c;--muted:#6d5a4c;--ketchup:#c9202a;--ketchup-deep:#9d141b;--mustard:#d79f00;--mustard-ink:#1b0b0c;--rotten:#5e8f1f;
+  --shadow:0 18px 40px rgba(60,30,10,.22);color-scheme:light}}
+:root[data-theme="light"]{
+  --bg:#f3ead9;--surface:#ebe0cb;--surface-2:#e2d5bc;--line:rgba(27,11,12,.14);--line-strong:rgba(27,11,12,.3);
+  --ink:#1b0b0c;--muted:#6d5a4c;--ketchup:#c9202a;--ketchup-deep:#9d141b;--mustard:#d79f00;--mustard-ink:#1b0b0c;--rotten:#5e8f1f;
+  --shadow:0 18px 40px rgba(60,30,10,.22);color-scheme:light}
+
+*{box-sizing:border-box}
+html,body{height:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--body);font-size:15px;line-height:1.4;
+  -webkit-font-smoothing:antialiased;overflow-x:hidden}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:30;background:var(--bg)}
+button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:pointer;-webkit-tap-highlight-color:transparent;touch-action:manipulation;text-align:left}
+a{color:inherit}
+:focus-visible{outline:2px solid var(--mustard);outline-offset:3px}
+:focus:not(:focus-visible){outline:none}
+.gutter{padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.wrap{max-width:1120px;margin:0 auto}
+.d{font-family:var(--display);text-transform:uppercase;letter-spacing:.01em;line-height:.9}
+.num{font-variant-numeric:tabular-nums}
+.cap{font-size:.72rem;font-weight:600;letter-spacing:.09em;text-transform:uppercase;color:var(--muted)}
+
+/* ---------- top bar ---------- */
+.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:var(--bg);border-bottom:1px solid var(--line)}
+.top .wrap{display:flex;align-items:center;gap:14px;height:56px}
+.mark{display:flex;align-items:center;gap:9px;flex:0 0 auto;text-decoration:none}
+.mark svg{width:22px;height:30px}
+.mark .d{font-size:1.9rem;font-weight:900;letter-spacing:.03em}
+.mark .d i{font-style:normal;color:var(--ketchup)}
+.back{display:none;align-items:center;gap:8px;height:40px;padding-right:10px;font-weight:600;color:var(--muted)}
+.back svg{width:20px;height:20px}
+.back:hover{color:var(--ink)}
+body[data-view="franchise"] .back{display:inline-flex}
+.top-title{flex:1;min-width:0;display:none;font-size:1.35rem;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+body[data-view="franchise"] .top-title{display:block}
+body[data-view="franchise"] .mark{display:none}
+@media (min-width:720px){body[data-view="franchise"] .mark{display:flex}}
+.search{flex:1;min-width:0;position:relative;display:flex;align-items:center}
+body[data-view="franchise"] .search{display:none}
+.search svg{position:absolute;left:12px;width:16px;height:16px;color:var(--muted);pointer-events:none}
+.search input{width:100%;height:38px;background:var(--surface);border:1px solid var(--line);color:var(--ink);padding:0 34px;font:inherit;font-size:.92rem;border-radius:3px}
+.search input::placeholder{color:var(--muted)}
+.search input:focus{border-color:var(--line-strong);outline:none}
+.search .clear{position:absolute;right:6px;width:28px;height:28px;display:none;place-items:center;color:var(--muted)}
+.search .clear svg{position:static;width:14px;height:14px;color:inherit}
+.search.has .clear{display:grid}
+.stat{flex:0 0 auto;text-align:right;line-height:1.15}
+.stat b{display:block;font-family:var(--display);font-size:1.5rem;font-weight:700}
+@media (max-width:719px){.stat{display:none}}
+
+/* ---------- search results ---------- */
+.results{position:absolute;top:calc(100% + 6px);left:0;right:0;background:var(--surface);border:1px solid var(--line-strong);box-shadow:var(--shadow);max-height:60vh;overflow:auto;z-index:25;display:none;border-radius:3px}
+.results.open{display:block}
+.results .grp{padding:10px 12px 4px;border-top:1px solid var(--line)}
+.results .grp:first-child{border-top:0}
+.results button{display:flex;width:100%;align-items:center;gap:10px;padding:9px 12px;font-size:.92rem}
+.results button:hover,.results button.sel{background:var(--surface-2)}
+.results .sub{margin-left:auto;color:var(--muted);font-size:.78rem;white-space:nowrap}
+.results .none{padding:14px 12px;color:var(--muted)}
+
+/* ---------- library ---------- */
+.lib{padding-block:22px 60px}
+.tonight{display:grid;grid-template-columns:116px 1fr;gap:18px;align-items:stretch;padding:18px 0 22px;border-bottom:1px solid var(--line)}
+.tonight .post{aspect-ratio:2/3;max-width:100%;border-radius:2px;overflow:hidden;position:relative;background:var(--surface-2);box-shadow:var(--shadow)}
+.tonight .body{display:flex;flex-direction:column;justify-content:space-between;gap:10px;min-width:0}
+.tonight h2{margin:4px 0 0;font-size:clamp(2.1rem,7vw,3.6rem);font-weight:900;text-wrap:balance}
+.tonight .why{color:var(--muted);font-size:.92rem;max-width:56ch;margin:0}
+.actions{display:flex;gap:8px;flex-wrap:wrap}
+.btn{display:inline-flex;align-items:center;gap:8px;height:42px;padding:0 16px;border:1px solid var(--line-strong);border-radius:3px;font-weight:600;font-size:.9rem;transition:background .12s,border-color .12s,transform .08s;white-space:nowrap}
+.btn:hover{background:var(--surface-2)}
+.btn:active{transform:translateY(1px)}
+.btn.primary{background:var(--ketchup);border-color:var(--ketchup);color:#fff}
+.btn.primary:hover{background:var(--ketchup-deep);border-color:var(--ketchup-deep)}
+.btn.mustard{background:var(--mustard);border-color:var(--mustard);color:var(--mustard-ink)}
+.btn.ghost{border-color:transparent;color:var(--muted)}
+.btn.ghost:hover{color:var(--ink)}
+.btn svg{width:16px;height:16px}
+.btn.sm{height:34px;padding:0 12px;font-size:.82rem}
+
+.ledger-head{display:flex;align-items:end;justify-content:space-between;gap:12px;flex-wrap:wrap;padding:22px 0 10px}
+.ledger-head h3{margin:0;font-size:1.6rem;font-weight:700}
+.sorts{display:flex;gap:2px;border-bottom:1px solid var(--line)}
+.sorts button{padding:8px 10px 10px;font-size:.82rem;font-weight:600;color:var(--muted);position:relative}
+.sorts button.on{color:var(--ink)}
+.sorts button.on::after{content:"";position:absolute;left:10px;right:10px;bottom:-1px;height:2px;background:var(--ketchup)}
+.ledger{display:grid}
+.row{display:grid;grid-template-columns:34px 1fr auto;gap:0 14px;align-items:center;padding:12px 0;border-bottom:1px solid var(--line);width:100%;transition:background .12s}
+.row:hover{background:var(--surface)}
+.row .idx{font-family:var(--display);font-size:1.3rem;font-weight:700;color:var(--muted);text-align:right}
+.row .name{font-family:var(--display);font-size:1.55rem;font-weight:700;line-height:1;letter-spacing:.01em}
+.row .sub{display:flex;gap:10px;flex-wrap:wrap;margin-top:5px;font-size:.8rem;color:var(--muted)}
+.row .sub .next{color:var(--ink)}
+.row .sub .next::before{content:"Next · ";color:var(--muted)}
+.row .right{display:grid;justify-items:end;gap:6px;min-width:96px}
+.row .frac{font-family:var(--display);font-size:1.35rem;font-weight:700;line-height:1}
+.row .frac small{font-size:.9rem;color:var(--muted);font-weight:500}
+.row.done .name{color:var(--muted)}
+.row.done .frac{color:var(--mustard)}
+.bar{width:96px;height:4px;background:var(--surface-2);overflow:hidden}
+.bar i{display:block;height:100%;background:var(--ketchup);transition:width .3s}
+.row.done .bar i{background:var(--mustard)}
+@media (max-width:560px){
+  .row{grid-template-columns:1fr auto;gap:0 10px}
+  .row .idx{display:none}
+  .row .name{font-size:1.35rem}
+  .row .sub .avg{display:none}
+  .row .right{min-width:70px}.bar{width:70px}
+}
+.libfoot{display:flex;gap:16px;flex-wrap:wrap;align-items:center;justify-content:space-between;padding-top:22px;color:var(--muted);font-size:.8rem}
+.libfoot .tools{display:flex;gap:4px}
+
+/* ---------- franchise view ---------- */
+.fr{padding-block:18px 120px}
+.fr-head{display:grid;grid-template-columns:1fr auto;gap:12px 24px;align-items:end;padding-bottom:16px;border-bottom:1px solid var(--line)}
+.fr-head h2{margin:2px 0 8px;font-size:clamp(2.6rem,9vw,4.6rem);font-weight:900;text-wrap:balance}
+.fr-head .note{margin:0;color:var(--muted);max-width:62ch;font-size:.93rem}
+.ends{display:grid;grid-template-columns:auto 1fr;gap:3px 10px;align-items:baseline;font-size:.88rem;min-width:220px}
+.ends .cap{text-align:right}
+.ends b{font-weight:600}
+@media (max-width:719px){.fr-head{grid-template-columns:1fr}.ends{min-width:0}}
+.fr-tools{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;padding:12px 0 18px}
+@media (max-width:719px){.fr-tools{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;margin-inline:calc(-1*max(16px,env(safe-area-inset-left,0px))) calc(-1*max(16px,env(safe-area-inset-right,0px)));padding-inline:max(16px,env(safe-area-inset-left,0px)) max(16px,env(safe-area-inset-right,0px));justify-content:flex-start}.fr-tools::-webkit-scrollbar{display:none}.fr-tools>*{flex:0 0 auto}.toggles{flex-wrap:nowrap}.toggles .tog,.seg button{white-space:nowrap}}
+.seg{display:inline-flex;border:1px solid var(--line-strong);border-radius:3px;overflow:hidden}
+.seg button{height:34px;padding:0 12px;font-size:.82rem;font-weight:600;color:var(--muted);border-right:1px solid var(--line)}
+.seg button:last-child{border-right:0}
+.seg button.on{background:var(--ink);color:var(--bg)}
+.seg button:hover:not(.on){background:var(--surface)}
+.toggles{display:flex;gap:6px;flex-wrap:wrap}
+.tog{height:34px;padding:0 12px;border:1px solid var(--line);border-radius:3px;font-size:.82rem;font-weight:600;color:var(--muted);display:inline-flex;align-items:center;gap:7px}
+.tog i{width:8px;height:8px;border-radius:50%;background:var(--line-strong);transition:background .12s}
+.tog.on{color:var(--ink);border-color:var(--line-strong)}
+.tog.on i{background:var(--mustard)}
+.wall{display:grid;grid-template-columns:repeat(auto-fill,minmax(148px,1fr));gap:22px 14px}
+@media (max-width:480px){.wall{grid-template-columns:repeat(3,minmax(0,1fr));gap:16px 8px}}
+.item{display:grid;gap:7px;width:100%;min-width:0;position:relative}
+.poster,.post,.thumb{container-type:inline-size}
+.poster{position:relative;aspect-ratio:2/3;max-width:100%;overflow:hidden;border-radius:2px;background:var(--surface-2);
+  box-shadow:0 10px 24px rgba(0,0,0,.4);transition:transform .15s,filter .25s,outline-color .15s;outline:2px solid transparent;outline-offset:0}
+.item:hover .poster{transform:translateY(-3px)}
+.item:active .poster{transform:scale(.97)}
+.poster img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block}
+.fallback{position:absolute;inset:0;display:grid;grid-template-rows:1fr auto;padding:10px;
+  background:linear-gradient(170deg,hsl(var(--h) 55% 24%),hsl(calc(var(--h) + 18) 60% 12%))}
+.fallback .ft{align-self:end;font-family:var(--display);font-weight:900;text-transform:uppercase;line-height:.9;font-size:clamp(.8rem,13cqw,1.5rem);color:#f3e7d3;overflow-wrap:break-word;hyphens:auto}
+.fallback .fy{margin-top:6px;font-size:.7rem;letter-spacing:.1em;color:rgba(243,231,211,.7)}
+.tab{position:absolute;left:0;top:0;z-index:2;min-width:30px;height:28px;padding:0 7px;background:var(--ink);color:var(--bg);
+  font-family:var(--display);font-weight:900;font-size:1.2rem;line-height:28px;text-align:center;border-radius:2px 0 4px 0}
+.chk{position:absolute;right:6px;top:6px;z-index:3;width:30px;height:30px;border-radius:50%;background:rgba(18,4,5,.7);border:1.5px solid rgba(243,231,211,.55);
+  display:grid;place-items:center;color:#f3e7d3;opacity:0;transition:opacity .15s,background .15s,transform .2s cubic-bezier(.2,1.5,.4,1)}
+.chk svg{width:16px;height:16px}
+.item:hover .chk,.item:focus-within .chk{opacity:1}
+@media (hover:none){.chk{opacity:1}}
+.item.done .chk{opacity:1;background:var(--mustard);color:var(--mustard-ink);border-color:var(--mustard)}
+.item.done .poster{filter:saturate(.25) brightness(.55)}
+.item.done .tab{background:var(--mustard);color:var(--mustard-ink)}
+.item.next .poster{outline-color:var(--mustard)}
+.nextlab{position:absolute;z-index:2;left:0;bottom:0;background:var(--mustard);color:var(--mustard-ink);font-size:.66rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;padding:4px 8px;border-radius:0 3px 0 0}
+.item.soon .poster{outline:1px dashed var(--line-strong)}
+.squeeze{animation:squeeze .35s}
+@keyframes squeeze{0%{transform:scale(1)}35%{transform:scale(.93,1.05)}65%{transform:scale(1.04,.96)}100%{transform:scale(1)}}
+.ttl{font-weight:600;font-size:.86rem;line-height:1.2;overflow-wrap:anywhere}
+.item.done .ttl{color:var(--muted)}
+.sub2{display:flex;align-items:center;gap:4px 8px;flex-wrap:wrap;font-size:.76rem;color:var(--muted)}
+.rt{display:inline-flex;align-items:center;gap:4px;font-weight:700;color:var(--ink)}
+.rt svg{width:14px;height:14px}
+.rt.fresh svg{color:var(--ketchup)}
+.rt.rotten svg{color:var(--rotten)}
+.rt.tbd{color:var(--muted);font-weight:500}
+.empty{padding:40px 0;color:var(--muted)}
+.fr-nav{display:flex;justify-content:space-between;gap:12px;margin-top:40px;padding-top:16px;border-top:1px solid var(--line)}
+.fr-nav button{display:grid;gap:3px;max-width:48%}
+.fr-nav button:last-child{text-align:right;justify-items:end}
+.fr-nav .d{font-size:1.4rem;font-weight:700}
+.fr-nav button:hover .d{color:var(--ketchup)}
+
+/* sticky up-next bar */
+.upbar{position:fixed;left:0;right:0;bottom:0;z-index:15;background:var(--surface);border-top:1px solid var(--line-strong);
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-bottom:env(safe-area-inset-bottom,0px);
+  transform:translateY(110%);transition:transform .25s}
+body[data-view="franchise"] .upbar{transform:none}
+.upbar .wrap{display:flex;align-items:center;gap:12px;height:66px}
+.upbar .thumb{width:30px;height:45px;flex:0 0 auto;background:var(--surface-2);overflow:hidden;border-radius:2px;position:relative}
+.upbar .thumb img{width:100%;height:100%;object-fit:cover;display:block}
+.upbar .thumb .ft,.upbar .thumb .fy{display:none}
+.upbar .txt{flex:1;min-width:0;line-height:1.2}
+.upbar .txt b{display:block;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.upbar .txt small{color:var(--muted);font-size:.78rem}
+.upbar .btn{flex:0 0 auto}
+
+/* ---------- sheet ---------- */
+.scrim{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:40;opacity:0;pointer-events:none;transition:opacity .2s}
+.sheet{position:fixed;left:0;right:0;bottom:0;z-index:41;background:var(--surface);border-top:1px solid var(--line-strong);
+  border-radius:10px 10px 0 0;transform:translateY(105%);transition:transform .28s cubic-bezier(.2,.9,.3,1);max-height:88vh;overflow:auto;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-bottom:calc(16px + env(safe-area-inset-bottom,0px))}
+body.sheet-open .scrim{opacity:1;pointer-events:auto}
+body.sheet-open .sheet{transform:none}
+.sheet .wrap{max-width:720px}
+.grab{width:36px;height:4px;border-radius:2px;background:var(--line-strong);margin:10px auto 14px}
+.sh{display:grid;grid-template-columns:120px 1fr;gap:16px}
+.sh .post{aspect-ratio:2/3;max-width:100%;border-radius:2px;overflow:hidden;position:relative;background:var(--surface-2)}
+.sh h3{margin:0 0 6px;font-size:clamp(1.9rem,6vw,2.6rem);font-weight:900;text-wrap:balance}
+.facts{display:grid;grid-template-columns:auto 1fr;gap:4px 12px;font-size:.88rem;align-items:baseline;margin:8px 0 14px}
+.facts .cap{text-align:right}
+.sheet .actions{margin-top:4px}
+.links{display:flex;gap:14px;flex-wrap:wrap;margin-top:16px;padding-top:12px;border-top:1px solid var(--line);font-size:.84rem}
+.links a{color:var(--muted);text-decoration:none;border-bottom:1px solid var(--line-strong);padding-bottom:1px}
+.links a:hover{color:var(--ink)}
+.sheet .close{position:absolute;right:max(10px,env(safe-area-inset-right,0px));top:8px;width:36px;height:36px;display:grid;place-items:center;color:var(--muted)}
+.sheet .close svg{width:18px;height:18px}
+@media (max-width:420px){.sh{grid-template-columns:96px 1fr}}
+
+/* ---------- toast ---------- */
+.toast{position:fixed;left:50%;bottom:calc(84px + env(safe-area-inset-bottom,0px));transform:translate(-50%,20px);z-index:50;background:var(--ink);color:var(--bg);
+  padding:10px 10px 10px 14px;border-radius:4px;display:flex;align-items:center;gap:12px;font-size:.88rem;font-weight:500;opacity:0;pointer-events:none;transition:opacity .2s,transform .2s;max-width:calc(100% - 32px)}
+.toast.show{opacity:1;transform:translate(-50%,0);pointer-events:auto}
+.toast button{font-weight:700;color:var(--ketchup);padding:4px 6px;text-transform:uppercase;letter-spacing:.06em;font-size:.78rem}
+body[data-view="library"] .toast{bottom:calc(20px + env(safe-area-inset-bottom,0px))}
+body.sheet-open .toast{bottom:auto;top:calc(14px + env(safe-area-inset-top,0px));transform:translate(-50%,-20px)}
+body.sheet-open .toast.show{transform:translate(-50%,0)}
+
+.hap{position:fixed;left:-9999px;top:0;opacity:0;pointer-events:none}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="i-fresh" viewBox="0 0 24 24"><path fill="currentColor" d="M12 6.5c4.7 0 8 2.7 8 7.2S16.4 21 12 21s-8-2.8-8-7.3 3.3-7.2 8-7.2z"/><path fill="#8fc43f" d="M12 7c-.3-2 .6-3.6 2.4-4.4-.2 1.2.1 2 .9 2.7-1.4 0-2.4.6-3.3 1.7zM12 7c-1.3-1.2-3-1.5-4.6-.8 1.1.3 1.8.9 2.3 1.7.7-.6 1.5-.9 2.3-.9z"/></symbol>
+  <symbol id="i-rotten" viewBox="0 0 24 24"><path fill="currentColor" d="M7 4c1.5-1.9 4.3-1.5 5 .6 1-1.4 3.3-1.3 4 .4 2.2-.5 4 1.6 3 3.6 1.7 1 1.4 3.6-.6 4 .7 2.3-1.7 4-3.6 2.9-.7 2.1-3.6 2.4-4.6.5-1.6 1.6-4.4.6-4.5-1.6-2.4.3-3.9-2.5-2.2-4.1C1.7 9.5 2.3 6.3 4.8 6.4 4.4 5.2 5.6 3.9 7 4z"/></symbol>
+  <symbol id="i-check" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" d="M5 12.5l4.5 4.5L19 7.5"/></symbol>
+  <symbol id="i-x" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" d="M6 6l12 12M18 6L6 18"/></symbol>
+  <symbol id="i-back" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" d="M15 5l-7 7 7 7"/></symbol>
+  <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.5" fill="none" stroke="currentColor" stroke-width="2.2"/><path d="M16 16l4.5 4.5" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></symbol>
+  <symbol id="i-bottle" viewBox="0 0 22 30"><path d="M8 0h6v3H8z" fill="currentColor"/><path d="M7 3h8l1 3H6z" fill="currentColor" opacity=".7"/><path d="M6 6h10v3H6z" fill="currentColor"/><rect x="4" y="9" width="14" height="21" rx="4" fill="#e2262e"/><rect x="6.5" y="15" width="9" height="8" rx="1" fill="currentColor"/></symbol>
+</svg>
+<label class="hap" aria-hidden="true"><input id="hapSwitch" type="checkbox" switch tabindex="-1"></label>
+
+<header class="top gutter">
+  <div class="wrap">
+    <button class="back" id="back"><svg aria-hidden="true"><use href="#i-back"/></svg>Library</button>
+    <a class="mark" href="#library" aria-label="Catchup home"><svg aria-hidden="true"><use href="#i-bottle"/></svg><span class="d">Catch<i>up</i></span></a>
+    <div class="top-title d" id="topTitle"></div>
+    <div class="search" id="searchWrap">
+      <svg aria-hidden="true"><use href="#i-search"/></svg>
+      <input id="q" type="search" placeholder="Search 66 franchises, 400 titles" autocomplete="off" aria-label="Search" aria-expanded="false" aria-controls="results">
+      <button class="clear" id="qClear" aria-label="Clear search"><svg aria-hidden="true"><use href="#i-x"/></svg></button>
+      <div class="results" id="results" role="listbox"></div>
+    </div>
+    <div class="stat"><b class="num" id="statN">0</b><span class="cap">caught up</span></div>
+  </div>
+</header>
+
+<main id="view" class="gutter"></main>
+
+<div class="upbar" id="upbar"><div class="wrap"></div></div>
+<div class="scrim" id="scrim"></div>
+<section class="sheet" id="sheet" role="dialog" aria-modal="true" aria-labelledby="shTitle"><div class="wrap" id="sheetBody"></div></section>
+<div class="toast" id="toast" role="status"></div>
+
+<script>
+const F=[
+{id:'mcu',name:'Marvel Cinematic Universe',hue:0,note:'Story order follows the official Disney+ timeline, which is why Captain America and Captain Marvel jump ahead of Iron Man.',items:[
+['Captain America: The First Avenger','2011-07',80,'m'],['Captain Marvel','2019-03',79,'m','Captain Marvel (film)'],['Iron Man','2008-05',94,'m','Iron Man (2008 film)'],['Iron Man 2','2010-05',72,'m'],['The Incredible Hulk','2008-06',67,'m','The Incredible Hulk (film)'],['Thor','2011-05',77,'m','Thor (film)'],['The Avengers','2012-05',91,'m','The Avengers (2012 film)'],['Iron Man 3','2013-05',79,'m'],['Thor: The Dark World','2013-11',66,'m'],['Captain America: The Winter Soldier','2014-04',90,'m'],['Guardians of the Galaxy','2014-08',92,'m','Guardians of the Galaxy (film)'],['Guardians of the Galaxy Vol. 2','2017-05',85,'m'],['Avengers: Age of Ultron','2015-05',76,'m'],['Ant-Man','2015-07',83,'m','Ant-Man (film)'],['Captain America: Civil War','2016-05',90,'m'],['Black Widow','2021-07',79,'m','Black Widow (2021 film)'],['Black Panther','2018-02',96,'m','Black Panther (film)'],['Spider-Man: Homecoming','2017-07',92,'m'],['Doctor Strange','2016-11',89,'m','Doctor Strange (2016 film)'],['Thor: Ragnarok','2017-11',93,'m'],['Ant-Man and the Wasp','2018-07',87,'m'],['Avengers: Infinity War','2018-04',85,'m'],['Avengers: Endgame','2019-04',94,'m'],['Loki','2021-06',92,'t','Loki (TV series)'],['WandaVision','2021-01',91,'t'],['The Falcon and the Winter Soldier','2021-03',86,'t'],['Shang-Chi and the Legend of the Ten Rings','2021-09',91,'m'],['Eternals','2021-11',47,'m','Eternals (film)'],['Spider-Man: No Way Home','2021-12',93,'m'],['Hawkeye','2021-11',92,'t','Hawkeye (miniseries)'],['Moon Knight','2022-03',86,'t','Moon Knight (miniseries)'],['Doctor Strange in the Multiverse of Madness','2022-05',73,'m'],['Ms. Marvel','2022-06',98,'t','Ms. Marvel (miniseries)'],['Thor: Love and Thunder','2022-07',63,'m'],['She-Hulk: Attorney at Law','2022-08',79,'t'],['Black Panther: Wakanda Forever','2022-11',83,'m'],['Ant-Man and the Wasp: Quantumania','2023-02',46,'m'],['Guardians of the Galaxy Vol. 3','2023-05',82,'m'],['Secret Invasion','2023-06',53,'t','Secret Invasion (miniseries)'],['The Marvels','2023-11',62,'m'],['Echo','2024-01',69,'t','Echo (miniseries)'],['Deadpool & Wolverine','2024-07',78,'m'],['Agatha All Along','2024-09',86,'t'],['Captain America: Brave New World','2025-02',48,'m'],['Daredevil: Born Again','2025-03',86,'t'],['Thunderbolts*','2025-05',88,'m'],['Ironheart','2025-06',75,'t','Ironheart (miniseries)'],['The Fantastic Four: First Steps','2025-07',87,'m'],['Spider-Man: Brand New Day','2026-07',null,'m'],['Avengers: Doomsday','2026-12',null,'m']]},
+{id:'starwars',name:'Star Wars',hue:36,note:'Story order runs by in-universe year (BBY/ABY). Rogue One ends minutes before A New Hope begins.',items:[
+['The Acolyte','2024-06',78,'t','The Acolyte (TV series)'],['Episode I – The Phantom Menace','1999-05',52,'m','Star Wars: Episode I – The Phantom Menace'],['Episode II – Attack of the Clones','2002-05',65,'m','Star Wars: Episode II – Attack of the Clones'],['The Clone Wars','2008-10',93,'t','Star Wars: The Clone Wars (2008 TV series)'],['Episode III – Revenge of the Sith','2005-05',79,'m','Star Wars: Episode III – Revenge of the Sith'],['The Bad Batch','2021-05',87,'t','Star Wars: The Bad Batch'],['Solo: A Star Wars Story','2018-05',69,'m'],['Obi-Wan Kenobi','2022-05',82,'t','Obi-Wan Kenobi (miniseries)'],['Andor','2022-09',96,'t','Andor (TV series)'],['Star Wars Rebels','2014-10',98,'t'],['Rogue One: A Star Wars Story','2016-12',84,'m','Rogue One'],['Episode IV – A New Hope','1977-05',93,'m','Star Wars (film)'],['Episode V – The Empire Strikes Back','1980-05',95,'m','The Empire Strikes Back'],['Episode VI – Return of the Jedi','1983-05',83,'m','Return of the Jedi'],['The Mandalorian','2019-11',90,'t'],['The Book of Boba Fett','2021-12',66,'t'],['Ahsoka','2023-08',86,'t','Ahsoka (TV series)'],['Skeleton Crew','2024-12',94,'t','Star Wars: Skeleton Crew'],['The Mandalorian and Grogu','2026-05',null,'m'],['Episode VII – The Force Awakens','2015-12',93,'m','Star Wars: The Force Awakens'],['Episode VIII – The Last Jedi','2017-12',91,'m','Star Wars: The Last Jedi'],['Episode IX – The Rise of Skywalker','2019-12',51,'m','Star Wars: The Rise of Skywalker']]},
+{id:'dc',name:'DC: Extended Universe → DCU',hue:220,note:'The DCEU runs through Aquaman and the Lost Kingdom; Creature Commandos reboots everything as the DCU.',items:[
+['Wonder Woman','2017-06',93,'m','Wonder Woman (2017 film)'],['Wonder Woman 1984','2020-12',58,'m'],['Man of Steel','2013-06',56,'m'],['Batman v Superman: Dawn of Justice','2016-03',29,'m'],['Suicide Squad','2016-08',26,'m','Suicide Squad (2016 film)'],["Zack Snyder's Justice League",'2021-03',71,'m'],['Aquaman','2018-12',65,'m','Aquaman (film)'],['Shazam!','2019-04',90,'m','Shazam! (film)'],['Birds of Prey','2020-02',79,'m','Birds of Prey (2020 film)'],['The Suicide Squad','2021-08',90,'m'],['Peacemaker','2022-01',94,'t','Peacemaker (TV series)'],['Black Adam','2022-10',38,'m','Black Adam (film)'],['Shazam! Fury of the Gods','2023-03',49,'m'],['The Flash','2023-06',63,'m','The Flash (film)'],['Blue Beetle','2023-08',78,'m','Blue Beetle (film)'],['Aquaman and the Lost Kingdom','2023-12',33,'m'],['Creature Commandos','2024-12',94,'t','Creature Commandos (TV series)'],['Superman','2025-07',83,'m','Superman (2025 film)'],['Supergirl','2026-06',null,'m','Supergirl (2026 film)']]},
+{id:'wizarding',name:'Wizarding World',hue:270,note:'Fantastic Beasts is set in the 1920s–30s, decades before Harry gets his letter.',items:[
+['Fantastic Beasts and Where to Find Them','2016-11',74,'m','Fantastic Beasts and Where to Find Them (film)'],['Fantastic Beasts: The Crimes of Grindelwald','2018-11',36,'m'],['Fantastic Beasts: The Secrets of Dumbledore','2022-04',46,'m'],["Harry Potter and the Sorcerer's Stone",'2001-11',81,'m',"Harry Potter and the Philosopher's Stone (film)"],['Harry Potter and the Chamber of Secrets','2002-11',82,'m','Harry Potter and the Chamber of Secrets (film)'],['Harry Potter and the Prisoner of Azkaban','2004-06',90,'m','Harry Potter and the Prisoner of Azkaban (film)'],['Harry Potter and the Goblet of Fire','2005-11',88,'m','Harry Potter and the Goblet of Fire (film)'],['Harry Potter and the Order of the Phoenix','2007-07',77,'m','Harry Potter and the Order of the Phoenix (film)'],['Harry Potter and the Half-Blood Prince','2009-07',83,'m','Harry Potter and the Half-Blood Prince (film)'],['Harry Potter and the Deathly Hallows – Part 1','2010-11',77,'m'],['Harry Potter and the Deathly Hallows – Part 2','2011-07',96,'m']]},
+{id:'middleearth',name:'Middle-earth',hue:120,note:'The Rings of Power is the Second Age; The Hobbit is 60 years before Fellowship.',items:[
+['The Rings of Power','2022-09',83,'t','The Lord of the Rings: The Rings of Power'],['The Hobbit: An Unexpected Journey','2012-12',64,'m'],['The Hobbit: The Desolation of Smaug','2013-12',74,'m'],['The Hobbit: The Battle of the Five Armies','2014-12',59,'m'],['The Lord of the Rings: The Fellowship of the Ring','2001-12',92,'m'],['The Lord of the Rings: The Two Towers','2002-12',95,'m'],['The Lord of the Rings: The Return of the King','2003-12',94,'m']]},
+{id:'fast',name:'Fast & Furious',hue:200,note:'Tokyo Drift was released third but happens after Fast & Furious 6. Han is why.',items:[
+['The Fast and the Furious','2001-06',55,'m'],['2 Fast 2 Furious','2003-06',36,'m'],['Fast & Furious','2009-04',29,'m','Fast & Furious (2009 film)'],['Fast Five','2011-04',78,'m'],['Fast & Furious 6','2013-05',71,'m'],['The Fast and the Furious: Tokyo Drift','2006-06',38,'m'],['Furious 7','2015-04',82,'m'],['The Fate of the Furious','2017-04',67,'m'],['Fast & Furious Presents: Hobbs & Shaw','2019-08',67,'m'],['F9','2021-06',59,'m','F9 (film)'],['Fast X','2023-05',56,'m']]},
+{id:'alien',name:'Alien',hue:160,note:'Prometheus (2093) → Covenant (2104) → Alien: Earth (2120) → Alien (2122). Romulus slots between Alien and Aliens.',items:[
+['Prometheus','2012-06',73,'m','Prometheus (2012 film)'],['Alien: Covenant','2017-05',65,'m'],['Alien: Earth','2025-08',93,'t'],['Alien','1979-05',93,'m','Alien (film)'],['Alien: Romulus','2024-08',80,'m'],['Aliens','1986-07',94,'m','Aliens (film)'],['Alien 3','1992-05',44,'m'],['Alien Resurrection','1997-11',55,'m']]},
+{id:'predator',name:'Predator',hue:95,note:'Prey is set in 1719 on the Northern Great Plains, so it starts the hunt.',items:[
+['Prey','2022-08',94,'m','Prey (2022 film)'],['Predator','1987-06',80,'m','Predator (film)'],['Predator 2','1990-11',31,'m'],['Predators','2010-07',65,'m','Predators (film)'],['The Predator','2018-09',33,'m','The Predator (film)'],['Predator: Killer of Killers','2025-06',96,'m'],['Predator: Badlands','2025-11',87,'m']]},
+{id:'terminator',name:'Terminator',hue:210,note:'Dark Fate is a direct sequel to T2 and ignores 3, Salvation and Genisys. Watch those as alternate timelines.',items:[
+['The Terminator','1984-10',100,'m'],['Terminator 2: Judgment Day','1991-07',91,'m'],['Terminator 3: Rise of the Machines','2003-07',69,'m'],['Terminator Salvation','2009-05',33,'m'],['Terminator Genisys','2015-07',26,'m'],['Terminator: Dark Fate','2019-11',70,'m']]},
+{id:'jurassic',name:'Jurassic Park',hue:140,note:'Story order and release order match. Hold on to your butts.',items:[
+['Jurassic Park','1993-06',91,'m','Jurassic Park (film)'],['The Lost World: Jurassic Park','1997-05',54,'m'],['Jurassic Park III','2001-07',49,'m'],['Jurassic World','2015-06',72,'m'],['Jurassic World: Fallen Kingdom','2018-06',47,'m'],['Jurassic World Dominion','2022-06',29,'m'],['Jurassic World Rebirth','2025-07',51,'m']]},
+{id:'mi',name:'Mission: Impossible',hue:15,note:'Every entry is a sequel to the last, so this one is simple. Fallout is the critics\' favorite.',items:[
+['Mission: Impossible','1996-05',66,'m','Mission: Impossible (film)'],['Mission: Impossible 2','2000-05',56,'m'],['Mission: Impossible III','2006-05',71,'m'],['Mission: Impossible – Ghost Protocol','2011-12',93,'m'],['Mission: Impossible – Rogue Nation','2015-07',94,'m'],['Mission: Impossible – Fallout','2018-07',97,'m'],['Mission: Impossible – Dead Reckoning','2023-07',96,'m','Mission: Impossible – Dead Reckoning Part One'],['Mission: Impossible – The Final Reckoning','2025-05',80,'m']]},
+{id:'bond',name:'James Bond (Craig era)',hue:240,note:'The five Daniel Craig films are the only Bond movies that form one continuous story.',items:[
+['Casino Royale','2006-11',94,'m','Casino Royale (2006 film)'],['Quantum of Solace','2008-11',63,'m'],['Skyfall','2012-11',92,'m'],['Spectre','2015-11',63,'m','Spectre (2015 film)'],['No Time to Die','2021-10',83,'m']]},
+{id:'conjuring',name:'The Conjuring Universe',hue:330,note:'Story order runs 1952 (The Nun) to 1986 (Last Rites). Release order is a completely different ride.',items:[
+['The Nun','2018-09',24,'m','The Nun (2018 film)'],['Annabelle: Creation','2017-08',70,'m'],['The Nun II','2023-09',52,'m'],['Annabelle','2014-10',29,'m','Annabelle (film)'],['The Conjuring','2013-07',86,'m'],['Annabelle Comes Home','2019-06',64,'m'],['The Curse of La Llorona','2019-04',28,'m'],['The Conjuring 2','2016-06',80,'m'],['The Conjuring: The Devil Made Me Do It','2021-06',56,'m'],['The Conjuring: Last Rites','2025-09',56,'m']]},
+{id:'xmen',name:'X-Men',hue:50,note:'Days of Future Past rewrites the timeline. This order follows the films as they were meant to connect.',items:[
+['X-Men: First Class','2011-06',86,'m'],['X-Men Origins: Wolverine','2009-05',37,'m'],['X-Men','2000-07',82,'m','X-Men (film)'],['X2','2003-05',85,'m','X2 (film)'],['X-Men: The Last Stand','2006-05',57,'m'],['The Wolverine','2013-07',71,'m'],['X-Men: Days of Future Past','2014-05',90,'m'],['X-Men: Apocalypse','2016-05',47,'m'],['Dark Phoenix','2019-06',22,'m','Dark Phoenix (film)'],['Deadpool','2016-02',85,'m','Deadpool (film)'],['Deadpool 2','2018-05',84,'m'],['The New Mutants','2020-08',36,'m'],['Logan','2017-03',94,'m','Logan (film)']]},
+{id:'darkknight',name:'The Dark Knight Trilogy',hue:230,note:'Three films, one order. Eight years pass between The Dark Knight and Rises.',items:[
+['Batman Begins','2005-06',85,'m'],['The Dark Knight','2008-07',94,'m'],['The Dark Knight Rises','2012-07',87,'m']]},
+{id:'thebatman',name:'The Batman (Reeves)',hue:250,note:'The Penguin picks up one week after The Batman ends.',items:[
+['The Batman','2022-03',85,'m','The Batman (film)'],['The Penguin','2024-09',95,'t','The Penguin (TV series)'],['The Batman Part II','2027-10',null,'m']]},
+{id:'apes',name:'Planet of the Apes (reboot)',hue:25,note:'Kingdom jumps roughly 300 years past Caesar.',items:[
+['Rise of the Planet of the Apes','2011-08',82,'m'],['Dawn of the Planet of the Apes','2014-07',91,'m'],['War for the Planet of the Apes','2017-07',94,'m'],['Kingdom of the Planet of the Apes','2024-05',80,'m']]},
+{id:'toystory',name:'Toy Story',hue:190,note:'Lightyear is the movie Andy saw that made him want the toy, so it technically comes first in his world. We keep it after.',items:[
+['Toy Story','1995-11',100,'m'],['Toy Story 2','1999-11',100,'m'],['Toy Story 3','2010-06',98,'m'],['Toy Story 4','2019-06',97,'m'],['Lightyear','2022-06',74,'m','Lightyear (film)'],['Toy Story 5','2026-06',null,'m']]},
+{id:'rocky',name:'Rocky & Creed',hue:40,note:'Nine films, one timeline, forty-seven years of Philadelphia.',items:[
+['Rocky','1976-11',92,'m'],['Rocky II','1979-06',72,'m'],['Rocky III','1982-05',66,'m'],['Rocky IV','1985-11',40,'m'],['Rocky V','1990-11',31,'m'],['Rocky Balboa','2006-12',77,'m'],['Creed','2015-11',95,'m','Creed (film)'],['Creed II','2018-11',83,'m'],['Creed III','2023-03',88,'m']]},
+{id:'indy',name:'Indiana Jones',hue:30,note:'Temple of Doom (1935) is a prequel to Raiders (1936).',items:[
+['Indiana Jones and the Temple of Doom','1984-05',77,'m'],['Raiders of the Lost Ark','1981-06',93,'m'],['Indiana Jones and the Last Crusade','1989-05',84,'m'],['Indiana Jones and the Kingdom of the Crystal Skull','2008-05',77,'m'],['Indiana Jones and the Dial of Destiny','2023-06',70,'m']]},
+{id:'madmax',name:'Mad Max',hue:35,note:'Furiosa is the prequel to Fury Road. The original trilogy is loosely connected at best.',items:[
+['Mad Max','1979-04',91,'m'],['Mad Max 2: The Road Warrior','1981-12',94,'m','Mad Max 2'],['Mad Max Beyond Thunderdome','1985-07',79,'m'],['Furiosa: A Mad Max Saga','2024-05',90,'m'],['Mad Max: Fury Road','2015-05',97,'m']]},
+{id:'pirates',name:'Pirates of the Caribbean',hue:195,note:'Straight through. Dead Man\'s Chest and At World\'s End were shot back to back.',items:[
+['Pirates of the Caribbean: The Curse of the Black Pearl','2003-07',79,'m'],["Pirates of the Caribbean: Dead Man's Chest",'2006-07',53,'m'],["Pirates of the Caribbean: At World's End",'2007-05',44,'m'],['Pirates of the Caribbean: On Stranger Tides','2011-05',33,'m'],['Pirates of the Caribbean: Dead Men Tell No Tales','2017-05',30,'m']]},
+{id:'johnwick',name:'John Wick',hue:280,note:'The Continental is 1970s New York. Ballerina happens between Chapter 3 and Chapter 4.',items:[
+['The Continental','2023-09',62,'t','The Continental (miniseries)'],['John Wick','2014-10',86,'m'],['John Wick: Chapter 2','2017-02',89,'m'],['John Wick: Chapter 3 – Parabellum','2019-05',89,'m'],['Ballerina','2025-06',76,'m','Ballerina (2025 film)'],['John Wick: Chapter 4','2023-03',94,'m']]},
+{id:'matrix',name:'The Matrix',hue:130,note:'Resurrections picks up 60 years after Revolutions.',items:[
+['The Matrix','1999-03',83,'m'],['The Matrix Reloaded','2003-05',74,'m'],['The Matrix Revolutions','2003-11',34,'m'],['The Matrix Resurrections','2021-12',63,'m']]},
+{id:'bttf',name:'Back to the Future',hue:180,note:'Part II starts on the exact shot Part I ends on.',items:[
+['Back to the Future','1985-07',93,'m'],['Back to the Future Part II','1989-11',65,'m'],['Back to the Future Part III','1990-05',80,'m']]},
+{id:'halloween',name:'Halloween (2018 timeline)',hue:20,note:'The 2018 film erases every sequel after the 1978 original.',items:[
+['Halloween','1978-10',96,'m','Halloween (1978 film)'],['Halloween (2018)','2018-10',79,'m','Halloween (2018 film)'],['Halloween Kills','2021-10',39,'m'],['Halloween Ends','2022-10',40,'m']]},
+{id:'scream',name:'Scream',hue:300,note:'Every Scream is a sequel. The 2022 film is a "requel" set 25 years after the first.',items:[
+['Scream','1996-12',81,'m','Scream (1996 film)'],['Scream 2','1997-12',82,'m'],['Scream 3','2000-02',41,'m'],['Scream 4','2011-04',60,'m'],['Scream (2022)','2022-01',76,'m','Scream (2022 film)'],['Scream VI','2023-03',76,'m'],['Scream 7','2026-02',null,'m']]},
+{id:'shrek',name:'Shrek',hue:100,note:'Puss in Boots (2011) is set before Puss ever meets Shrek.',items:[
+['Puss in Boots','2011-10',86,'m','Puss in Boots (film)'],['Shrek','2001-05',88,'m'],['Shrek 2','2004-05',89,'m'],['Shrek the Third','2007-05',41,'m'],['Shrek Forever After','2010-05',58,'m'],['Puss in Boots: The Last Wish','2022-12',95,'m'],['Shrek 5','2027-06',null,'m']]},
+{id:'despicable',name:'Despicable Me',hue:55,note:'Both Minions movies are prequels to the first Despicable Me.',items:[
+['Minions','2015-07',55,'m','Minions (film)'],['Minions: The Rise of Gru','2022-07',70,'m'],['Despicable Me','2010-07',81,'m'],['Despicable Me 2','2013-07',75,'m'],['Despicable Me 3','2017-06',59,'m'],['Despicable Me 4','2024-07',55,'m']]},
+{id:'httyd',name:'How to Train Your Dragon',hue:170,note:'The 2025 film is a live-action remake of the first, not a sequel.',items:[
+['How to Train Your Dragon','2010-03',99,'m','How to Train Your Dragon (film)'],['How to Train Your Dragon 2','2014-06',92,'m'],['How to Train Your Dragon: The Hidden World','2019-02',90,'m'],['How to Train Your Dragon (2025)','2025-06',77,'m','How to Train Your Dragon (2025 film)']]},
+{id:'hungergames',name:'The Hunger Games',hue:355,note:'Songbirds & Snakes is 64 years before Katniss; Sunrise on the Reaping is 24 years before.',items:[
+['The Hunger Games: The Ballad of Songbirds & Snakes','2023-11',64,'m'],['The Hunger Games: Sunrise on the Reaping','2026-11',null,'m'],['The Hunger Games','2012-03',84,'m','The Hunger Games (film)'],['The Hunger Games: Catching Fire','2013-11',90,'m'],['The Hunger Games: Mockingjay – Part 1','2014-11',70,'m'],['The Hunger Games: Mockingjay – Part 2','2015-11',70,'m']]},
+{id:'avatar',name:'Avatar',hue:205,note:'Straight through. Each sequel picks up roughly a year after the last.',items:[
+['Avatar','2009-12',81,'m','Avatar (2009 film)'],['Avatar: The Way of Water','2022-12',76,'m'],['Avatar: Fire and Ash','2025-12',null,'m']]},
+{id:'monsterverse',name:'MonsterVerse',hue:150,note:'Kong: Skull Island is set in 1973, four decades before Godzilla (2014).',items:[
+['Kong: Skull Island','2017-03',75,'m'],['Godzilla','2014-05',76,'m','Godzilla (2014 film)'],['Godzilla: King of the Monsters','2019-05',42,'m'],['Godzilla vs. Kong','2021-03',75,'m'],['Monarch: Legacy of Monsters','2023-11',85,'t'],['Godzilla x Kong: The New Empire','2024-03',54,'m']]},
+{id:'dune',name:'Dune',hue:45,note:'Prophecy is set 10,000 years before Paul Atreides.',items:[
+['Dune: Prophecy','2024-11',73,'t'],['Dune','2021-10',83,'m','Dune (2021 film)'],['Dune: Part Two','2024-03',92,'m'],['Dune: Part Three','2026-12',null,'m']]},
+{id:'spidey',name:'Spider-Man (non-MCU)',hue:5,note:'Three separate universes: Raimi, Amazing, and the Spider-Verse. The MCU Spider-Man films live in the MCU list.',items:[
+['Spider-Man','2002-05',90,'m','Spider-Man (2002 film)'],['Spider-Man 2','2004-06',93,'m'],['Spider-Man 3','2007-05',63,'m'],['The Amazing Spider-Man','2012-07',72,'m','The Amazing Spider-Man (film)'],['The Amazing Spider-Man 2','2014-05',51,'m'],['Spider-Man: Into the Spider-Verse','2018-12',97,'m'],['Spider-Man: Across the Spider-Verse','2023-06',95,'m'],['Spider-Man: Beyond the Spider-Verse','2027-06',null,'m']]},
+{id:'breakingbad',name:'Breaking Bad Universe',hue:60,note:'Better Call Saul is mostly a prequel, but its black-and-white epilogue lands after El Camino.',items:[
+['Better Call Saul','2015-02',98,'t'],['Breaking Bad','2008-01',96,'t'],['El Camino: A Breaking Bad Movie','2019-10',91,'m']]},
+{id:'got',name:'Game of Thrones',hue:215,note:'House of the Dragon is ~170 years before Thrones; A Knight of the Seven Kingdoms is ~90 years before.',items:[
+['House of the Dragon','2022-08',85,'t'],['A Knight of the Seven Kingdoms','2026-01',null,'t','A Knight of the Seven Kingdoms (TV series)'],['Game of Thrones','2011-04',89,'t']]},
+{id:'yellowstone',name:'Yellowstone',hue:28,note:'1883 and 1923 are the Dutton family origin stories.',items:[
+['1883','2021-12',92,'t','1883 (TV series)'],['1923','2022-12',83,'t','1923 (TV series)'],['Yellowstone','2018-06',86,'t','Yellowstone (American TV series)']]},
+{id:'walkingdead',name:'The Walking Dead',hue:110,note:'Fear starts before the outbreak; the three newest spinoffs all follow the main show\'s finale.',items:[
+['The Walking Dead','2010-10',80,'t'],['Fear the Walking Dead','2015-08',75,'t'],['The Walking Dead: World Beyond','2020-10',61,'t'],['The Walking Dead: Dead City','2023-06',84,'t'],['The Walking Dead: Daryl Dixon','2023-09',90,'t'],['The Walking Dead: The Ones Who Live','2024-02',82,'t']]},
+{id:'twilight',name:'The Twilight Saga',hue:260,note:'Straight through. Critics never bit; fans did.',items:[
+['Twilight','2008-11',49,'m','Twilight (2008 film)'],['The Twilight Saga: New Moon','2009-11',29,'m'],['The Twilight Saga: Eclipse','2010-06',47,'m'],['The Twilight Saga: Breaking Dawn – Part 1','2011-11',25,'m'],['The Twilight Saga: Breaking Dawn – Part 2','2012-11',49,'m']]},
+{id:'transformers',name:'Transformers',hue:225,note:'Transformers One is Cybertron before Earth; Bumblebee is 1987; Rise of the Beasts is 1994.',items:[
+['Transformers One','2024-09',89,'m'],['Bumblebee','2018-12',91,'m','Bumblebee (film)'],['Transformers: Rise of the Beasts','2023-06',52,'m'],['Transformers','2007-07',57,'m','Transformers (film)'],['Transformers: Revenge of the Fallen','2009-06',20,'m'],['Transformers: Dark of the Moon','2011-06',35,'m'],['Transformers: Age of Extinction','2014-06',18,'m'],['Transformers: The Last Knight','2017-06',16,'m']]},
+{id:'diehard',name:'Die Hard',hue:10,note:'Five Christmases, one John McClane. Straight through.',items:[
+['Die Hard','1988-07',94,'m'],['Die Hard 2','1990-07',69,'m'],['Die Hard with a Vengeance','1995-05',60,'m'],['Live Free or Die Hard','2007-06',82,'m'],['A Good Day to Die Hard','2013-02',15,'m']]},
+{id:'ghostbusters',name:'Ghostbusters',hue:85,note:'Afterlife is a direct sequel to the 1984 and 1989 films; the 2016 reboot stands alone.',items:[
+['Ghostbusters','1984-06',95,'m'],['Ghostbusters II','1989-06',54,'m'],['Ghostbusters: Afterlife','2021-11',63,'m'],['Ghostbusters: Frozen Empire','2024-03',43,'m']]},
+{id:'sonic',name:'Sonic the Hedgehog',hue:235,note:'Knuckles slots between the second and third movies.',items:[
+['Sonic the Hedgehog','2020-02',63,'m','Sonic the Hedgehog (film)'],['Sonic the Hedgehog 2','2022-04',69,'m','Sonic the Hedgehog 2 (film)'],['Knuckles','2024-04',55,'t','Knuckles (TV series)'],['Sonic the Hedgehog 3','2024-12',86,'m','Sonic the Hedgehog 3 (film)'],['Sonic the Hedgehog 4','2027-03',null,'m']]},
+{id:'knivesout',name:'Knives Out',hue:70,note:'Each mystery stands alone; only Benoit Blanc carries over.',items:[
+['Knives Out','2019-11',97,'m'],['Glass Onion: A Knives Out Mystery','2022-12',92,'m','Glass Onion (film)'],['Wake Up Dead Man: A Knives Out Mystery','2025-11',null,'m','Wake Up Dead Man']]},
+{id:'bourne',name:'Jason Bourne',hue:200,note:'Legacy runs parallel to Ultimatum. Jason Bourne (2016) is nine years later.',items:[
+['The Bourne Identity','2002-06',84,'m','The Bourne Identity (2002 film)'],['The Bourne Supremacy','2004-07',81,'m','The Bourne Supremacy (film)'],['The Bourne Ultimatum','2007-08',92,'m','The Bourne Ultimatum (film)'],['The Bourne Legacy','2012-08',56,'m','The Bourne Legacy (film)'],['Jason Bourne','2016-07',54,'m','Jason Bourne (film)']]},
+{id:'kungfupanda',name:'Kung Fu Panda',hue:48,note:'Straight through. Skadoosh.',items:[
+['Kung Fu Panda','2008-06',87,'m'],['Kung Fu Panda 2','2011-05',81,'m'],['Kung Fu Panda 3','2016-01',87,'m'],['Kung Fu Panda 4','2024-03',71,'m']]},
+{id:'karatekid',name:'The Karate Kid',hue:32,note:'Cobra Kai picks up 34 years after the first film; Legends brings both Daniel and Mr. Han together.',items:[
+['The Karate Kid','1984-06',89,'m','The Karate Kid (1984 film)'],['The Karate Kid Part II','1986-06',45,'m'],['The Karate Kid Part III','1989-06',15,'m'],['The Next Karate Kid','1994-08',7,'m'],['The Karate Kid (2010)','2010-06',66,'m','The Karate Kid (2010 film)'],['Cobra Kai','2018-05',95,'t'],['Karate Kid: Legends','2025-05',58,'m']]},
+{id:'badboys',name:'Bad Boys',hue:195,note:'Straight through, 29 years apart at the ends.',items:[
+['Bad Boys','1995-04',43,'m','Bad Boys (1995 film)'],['Bad Boys II','2003-07',23,'m'],['Bad Boys for Life','2020-01',76,'m'],['Bad Boys: Ride or Die','2024-06',65,'m']]},
+{id:'topgun',name:'Top Gun',hue:208,note:'Maverick is set 36 years later and lands 38 points higher.',items:[
+['Top Gun','1986-05',58,'m'],['Top Gun: Maverick','2022-05',96,'m']]},
+{id:'mib',name:'Men in Black',hue:245,note:'International is a spinoff set in the same world, after MIB 3.',items:[
+['Men in Black','1997-07',92,'m','Men in Black (1997 film)'],['Men in Black II','2002-07',39,'m'],['Men in Black 3','2012-05',68,'m'],['Men in Black: International','2019-06',23,'m']]},
+{id:'paddington',name:'Paddington',hue:38,note:'Paddington 2 held a 100% Tomatometer for years. It still carries a 99.',items:[
+['Paddington','2014-11',97,'m','Paddington (film)'],['Paddington 2','2017-11',99,'m'],['Paddington in Peru','2024-11',94,'m']]},
+{id:'startrek',name:'Star Trek (Kelvin timeline)',hue:218,note:'The three J.J. Abrams-era films are their own timeline, split from the original in 2233.',items:[
+['Star Trek','2009-05',94,'m','Star Trek (2009 film)'],['Star Trek Into Darkness','2013-05',84,'m'],['Star Trek Beyond','2016-07',86,'m']]},
+{id:'theboys',name:'The Boys',hue:355,note:'Gen V season 1 slots between The Boys seasons 3 and 4.',items:[
+['The Boys','2019-07',93,'t','The Boys (TV series)'],['Gen V','2023-09',97,'t']]},
+{id:'vikings',name:'Vikings',hue:198,note:'Valhalla is set 100 years after Ragnar.',items:[
+['Vikings','2013-03',93,'t','Vikings (2013 TV series)'],['Vikings: Valhalla','2022-02',80,'t']]},
+{id:'oceans',name:"Ocean's",hue:65,note:"Ocean's 8 is Danny's sister, set after Thirteen.",items:[
+["Ocean's Eleven",'2001-12',83,'m',"Ocean's Eleven"],["Ocean's Twelve",'2004-12',55,'m'],["Ocean's Thirteen",'2007-06',70,'m'],["Ocean's 8",'2018-06',69,'m']]},
+{id:'jumanji',name:'Jumanji',hue:125,note:'The Rock-era films are sequels to the 1995 original; Alan Parrish gets a nod.',items:[
+['Jumanji','1995-12',55,'m','Jumanji (film)'],['Jumanji: Welcome to the Jungle','2017-12',76,'m'],['Jumanji: The Next Level','2019-12',71,'m']]},
+{id:'quietplace',name:'A Quiet Place',hue:175,note:'Day One is the invasion itself, so it starts the story.',items:[
+['A Quiet Place: Day One','2024-06',87,'m'],['A Quiet Place','2018-04',96,'m','A Quiet Place (film)'],['A Quiet Place Part II','2020-09',91,'m']]},
+{id:'28days',name:'28 Days Later',hue:90,note:'Weeks is six months after Days; Years is nearly three decades on.',items:[
+['28 Days Later','2002-11',87,'m'],['28 Weeks Later','2007-05',72,'m'],['28 Years Later','2025-06',89,'m'],['28 Years Later: The Bone Temple','2026-01',null,'m']]},
+{id:'finaldest',name:'Final Destination',hue:12,note:'Final Destination 5 is secretly a prequel to the first film. Bloodlines reaches back to 1968.',items:[
+['Final Destination 5','2011-08',62,'m'],['Final Destination','2000-03',36,'m','Final Destination (film)'],['Final Destination 2','2003-01',51,'m'],['Final Destination 3','2006-02',44,'m'],['The Final Destination','2009-08',27,'m'],['Final Destination Bloodlines','2025-05',92,'m']]},
+{id:'lionking',name:'The Lion King',hue:42,note:'Mufasa is the prequel to the 2019 remake. The 1994 original stands on its own.',items:[
+['The Lion King','1994-06',93,'m','The Lion King'],['Mufasa: The Lion King','2024-12',57,'m'],['The Lion King (2019)','2019-07',52,'m','The Lion King (2019 film)']]},
+{id:'frozen',name:'Frozen',hue:200,note:'Frozen III is on the calendar for 2027.',items:[
+['Frozen','2013-11',90,'m','Frozen (2013 film)'],['Frozen II','2019-11',77,'m'],['Frozen III','2027-11',null,'m']]},
+{id:'insideout',name:'Inside Out',hue:300,note:'Riley is 11 in the first film and 13 in the second.',items:[
+['Inside Out','2015-06',98,'m','Inside Out (2015 film)'],['Inside Out 2','2024-06',91,'m']]},
+{id:'moana',name:'Moana',hue:185,note:'The 2026 film is a live-action remake of the first.',items:[
+['Moana','2016-11',95,'m','Moana (2016 film)'],['Moana 2','2024-11',61,'m'],['Moana (2026)','2026-07',null,'m','Moana (2026 film)']]},
+{id:'zootopia',name:'Zootopia',hue:135,note:'Straight through.',items:[
+['Zootopia','2016-03',98,'m'],['Zootopia 2','2025-11',null,'m']]},
+{id:'wicked',name:'Wicked',hue:290,note:'One story cut in two at the intermission.',items:[
+['Wicked','2024-11',88,'m','Wicked (2024 film)'],['Wicked: For Good','2025-11',null,'m']]}
+];
+
+
+/* ---------- state ---------- */
+const now=new Date(),TODAY=now.getFullYear()+'-'+String(now.getMonth()+1).padStart(2,'0');
+const MON=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+const store={get(k,d){try{const v=localStorage.getItem(k);return v==null?d:JSON.parse(v)}catch(e){return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
+let watched=store.get('catchup.watched',{});
+let orderMode=store.get('catchup.order','story');
+let filters=store.get('catchup.filters',{kind:'all',unwatched:false,fresh:false});
+let librarySort=store.get('catchup.sort','continue');
+let view={name:'library',fid:null};
+const byId=Object.fromEntries(F.map(f=>[f.id,f]));
+const TOTAL=F.reduce((n,f)=>n+f.items.length,0);
+const $=s=>document.querySelector(s);
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const hapSwitch=$('#hapSwitch');
+function buzz(p){try{if(navigator.vibrate)navigator.vibrate(p)}catch(e){}try{hapSwitch.click()}catch(e){}}
+
+/* ---------- derived ---------- */
+const isDone=(f,i)=>!!(watched[f.id]&&watched[f.id][i]);
+const doneCount=f=>f.items.reduce((n,_,i)=>n+(isDone(f,i)?1:0),0);
+const released=it=>it[1]<=TODAY;
+function order(f,mode=orderMode){const idx=f.items.map((_,i)=>i);return mode==='release'?idx.sort((a,b)=>f.items[a][1].localeCompare(f.items[b][1])||a-b):idx}
+function nextUp(f){for(const i of order(f)){if(!isDone(f,i)&&released(f.items[i]))return i}return -1}
+function avgRT(f){const s=f.items.filter(x=>x[2]!=null);return s.length?Math.round(s.reduce((n,x)=>n+x[2],0)/s.length):null}
+const fmtDate=d=>MON[+d.slice(5,7)-1]+' '+d.slice(0,4);
+function rtBadge(it){const rt=it[2];
+  if(rt==null)return `<span class="rt tbd">${released(it)?'No score yet':fmtDate(it[1])}</span>`;
+  const fresh=rt>=60;return `<span class="rt ${fresh?'fresh':'rotten'}" title="Tomatometer ${rt}%"><svg aria-hidden="true"><use href="#i-${fresh?'fresh':'rotten'}"/></svg><span class="num">${rt}%</span></span>`}
+function posterHTML(f,i,cls=''){const it=f.items[i];const u=posterCache[key(it)];
+  return u?`<img src="${esc(u)}" alt="" loading="lazy">`:`<div class="fallback" style="--h:${f.hue}"><span class="ft">${esc(it[0])}</span><span class="fy">${it[1].slice(0,4)}${it[3]==='t'?' · SERIES':''}</span></div>`}
+
+/* ---------- library ---------- */
+function pickTonight(){
+  const started=F.filter(f=>doneCount(f)>0&&nextUp(f)>=0).sort((a,b)=>(doneCount(b)/b.items.length)-(doneCount(a)/a.items.length)||doneCount(b)-doneCount(a));
+  if(started.length){const f=started[0];return{f,i:nextUp(f),why:`You're ${doneCount(f)} of ${f.items.length} into ${f.name}. This is the next one in ${orderMode} order.`}}
+  const top=F.filter(f=>nextUp(f)>=0&&avgRT(f)!=null&&f.items.length>=4).sort((a,b)=>avgRT(b)-avgRT(a)).slice(0,10);
+  const day=Math.floor(Date.now()/864e5);const fresh=top[day%top.length]||F.find(f=>nextUp(f)>=0);
+  return{f:fresh,i:nextUp(fresh),why:`Nothing started yet. ${fresh.name} averages ${avgRT(fresh)}% with critics across ${fresh.items.length} titles, and this is where it begins. The pick changes nightly until you start something.`}
+}
+function sortedFranchises(){
+  const a=[...F];
+  const prog=f=>doneCount(f)/f.items.length;
+  if(librarySort==='az')return a.sort((x,y)=>x.name.localeCompare(y.name));
+  if(librarySort==='rated')return a.sort((x,y)=>(avgRT(y)||0)-(avgRT(x)||0));
+  if(librarySort==='size')return a.sort((x,y)=>y.items.length-x.items.length);
+  return a.sort((x,y)=>{const px=prog(x),py=prog(y);const sx=px>0&&px<1?0:px===0?1:2,sy=py>0&&py<1?0:py===0?1:2;
+    return sx-sy||(sx===0?py-px:0)||x.name.localeCompare(y.name)});
+}
+function renderLibrary(){
+  const t=pickTonight(),seen=F.reduce((n,f)=>n+doneCount(f),0);
+  const rows=sortedFranchises().map((f,n)=>{const d=doneCount(f),tot=f.items.length,nx=nextUp(f),tv=f.items.filter(x=>x[3]==='t').length,mv=tot-tv,avg=avgRT(f);
+    return `<button class="row${d===tot?' done':''}" data-open="${f.id}">
+      <span class="idx num">${n+1}</span>
+      <span><span class="name">${esc(f.name)}</span>
+        <span class="sub"><span>${mv?mv+(mv===1?' film':' films'):''}${mv&&tv?' · ':''}${tv?tv+(tv===1?' series':' series'):''}</span>${avg!=null?`<span class="avg">avg ${avg}%</span>`:''}${nx>=0?`<span class="next">${esc(f.items[nx][0])}</span>`:d===tot?`<span class="next" style="color:var(--mustard)">Caught up</span>`:''}</span></span>
+      <span class="right"><span class="frac num">${d}<small>/${tot}</small></span><span class="bar"><i style="width:${d/tot*100}%"></i></span></span>
+    </button>`}).join('');
+  $('#view').innerHTML=`<div class="wrap lib">
+    <section class="tonight" aria-label="Tonight">
+      <button class="post" data-sheet="${t.f.id}:${t.i}" aria-label="Open ${esc(t.f.items[t.i][0])}">${posterHTML(t.f,t.i)}</button>
+      <div class="body">
+        <div><span class="cap">Tonight</span><h2 class="d">${esc(t.f.items[t.i][0])}</h2>
+          <div class="sub2" style="margin:6px 0 10px">${rtBadge(t.f.items[t.i])}<span>${t.f.items[t.i][1].slice(0,4)}</span><span>${t.f.items[t.i][3]==='t'?'Series':'Film'}</span><span>#${order(t.f).indexOf(t.i)+1} of ${t.f.items.length}</span></div>
+          <p class="why">${esc(t.why)}</p></div>
+        <div class="actions"><button class="btn primary" data-watch="${t.f.id}:${t.i}"><svg aria-hidden="true"><use href="#i-check"/></svg>Watched it</button><button class="btn" data-open="${t.f.id}">Open ${esc(t.f.name)}</button></div>
+      </div>
+    </section>
+    <div class="ledger-head"><h3 class="d">All franchises</h3>
+      <div class="sorts" role="tablist">${[['continue','Continue'],['az','A–Z'],['rated','Best rated'],['size','Biggest']].map(([k,l])=>`<button data-sort="${k}" class="${librarySort===k?'on':''}">${l}</button>`).join('')}</div></div>
+    <div class="ledger">${rows}</div>
+    <div class="libfoot"><span>${seen} of ${TOTAL} titles caught up · ${F.length} franchises · story order is the order the events happen, not release order.</span>
+      <span class="tools"><button class="btn ghost sm" id="copyProg">Copy my progress</button><button class="btn ghost sm" id="resetProg">Reset</button></span></div>
+  </div>`;
+  loadPosters(t.f,[t.i]);
+}
+
+/* ---------- franchise ---------- */
+function visibleIdx(f){return order(f).filter(i=>{const it=f.items[i];
+  if(filters.kind==='m'&&it[3]!=='m')return false;if(filters.kind==='t'&&it[3]!=='t')return false;
+  if(filters.unwatched&&isDone(f,i))return false;if(filters.fresh&&it[2]!=null&&it[2]<60)return false;return true})}
+function renderFranchise(fid){
+  const f=byId[fid],fi=F.indexOf(f),idx=order(f),vis=visibleIdx(f),nx=nextUp(f),d=doneCount(f),tot=f.items.length;
+  const prev=F[(fi-1+F.length)%F.length],next=F[(fi+1)%F.length];
+  const first=f.items[idx[0]][0],last=f.items[idx[idx.length-1]][0];
+  const cards=vis.map(i=>{const it=f.items[i],n=idx.indexOf(i)+1;
+    return `<div class="item${isDone(f,i)?' done':''}${i===nx?' next':''}${released(it)?'':' soon'}" data-item="${i}">
+      <button class="poster" data-sheet="${f.id}:${i}" aria-label="${esc(it[0])}, details"><span class="tab num">${n}</span>${posterHTML(f,i)}${i===nx?'<span class="nextlab">Up next</span>':''}</button>
+      <button class="chk" data-watch="${f.id}:${i}" aria-pressed="${isDone(f,i)}" aria-label="${isDone(f,i)?'Unmark':'Mark'} ${esc(it[0])} watched"><svg aria-hidden="true"><use href="#i-check"/></svg></button>
+      <span class="ttl">${esc(it[0])}</span>
+      <span class="sub2">${rtBadge(it)}<span>${it[1].slice(0,4)}</span>${it[3]==='t'?'<span>Series</span>':''}</span>
+    </div>`}).join('');
+  $('#view').innerHTML=`<div class="wrap fr">
+    <div class="fr-head"><div><span class="cap">${fi+1} of ${F.length} · ${tot} titles · ${d} caught up</span><h2 class="d">${esc(f.name)}</h2><p class="note">${esc(f.note)}</p></div>
+      <div class="ends"><span class="cap">Start</span><b>${esc(first)}</b><span class="cap">End</span><b>${esc(last)}</b></div></div>
+    <div class="fr-tools">
+      <div class="seg" role="group" aria-label="Order"><button data-order="story" class="${orderMode==='story'?'on':''}">Story order</button><button data-order="release" class="${orderMode==='release'?'on':''}">Release order</button></div>
+      <div class="toggles">
+        <div class="seg" role="group" aria-label="Type"><button data-kind="all" class="${filters.kind==='all'?'on':''}">All</button><button data-kind="m" class="${filters.kind==='m'?'on':''}">Films</button><button data-kind="t" class="${filters.kind==='t'?'on':''}">Series</button></div>
+        <button class="tog${filters.unwatched?' on':''}" data-tog="unwatched" aria-pressed="${filters.unwatched}"><i></i>Unwatched only</button>
+        <button class="tog${filters.fresh?' on':''}" data-tog="fresh" aria-pressed="${filters.fresh}"><i></i>Skip the rotten</button>
+      </div></div>
+    ${vis.length?`<div class="wall">${cards}</div>`:`<p class="empty">Nothing matches these filters.</p>`}
+    <nav class="fr-nav"><button data-open="${prev.id}"><span class="cap">Previous</span><span class="d">${esc(prev.name)}</span></button><button data-open="${next.id}"><span class="cap">Next</span><span class="d">${esc(next.name)}</span></button></nav>
+  </div>`;
+  $('#topTitle').textContent=f.name;
+  renderUpbar(f);
+  loadPosters(f,idx);
+}
+function renderUpbar(f){
+  const nx=nextUp(f),w=$('#upbar .wrap');
+  if(nx<0){const d=doneCount(f);w.innerHTML=`<div class="txt"><b>${d===f.items.length?'All caught up.':'Nothing released left to watch.'}</b><small>${d} of ${f.items.length} watched</small></div><button class="btn" data-open="${F[(F.indexOf(f)+1)%F.length].id}">Next franchise</button>`;return}
+  const it=f.items[nx];
+  w.innerHTML=`<button class="thumb" data-sheet="${f.id}:${nx}" aria-label="Details">${posterHTML(f,nx)}</button>
+    <div class="txt"><b>${esc(it[0])}</b><small>Up next · #${order(f).indexOf(nx)+1} of ${f.items.length}${it[2]!=null?' · '+it[2]+'%':''}</small></div>
+    <button class="btn primary" data-watch="${f.id}:${nx}"><svg aria-hidden="true"><use href="#i-check"/></svg>Watched</button>`;
+}
+
+/* ---------- sheet ---------- */
+let sheetRef=null;
+function openSheet(fid,i){
+  const f=byId[fid],it=f.items[i],idx=order(f),pos=idx.indexOf(i)+1,done=isDone(f,i);sheetRef={fid,i};
+  const q=encodeURIComponent(it[0]);
+  $('#sheetBody').innerHTML=`<div class="grab"></div><button class="close" id="shClose" aria-label="Close"><svg aria-hidden="true"><use href="#i-x"/></svg></button>
+    <div class="sh"><div class="post">${posterHTML(f,i)}</div><div>
+      <span class="cap">${esc(f.name)}</span><h3 class="d" id="shTitle">${esc(it[0])}</h3>
+      <div class="facts">
+        <span class="cap">Watch</span><span>#${pos} of ${f.items.length} in ${orderMode} order${pos>1?` · after ${esc(f.items[idx[pos-2]][0])}`:' · this is where you start'}</span>
+        <span class="cap">Released</span><span>${fmtDate(it[1])}${released(it)?'':' · not out yet'} · ${it[3]==='t'?'Series':'Film'}</span>
+        <span class="cap">Critics</span><span>${rtBadge(it)}${it[2]!=null?` <span style="color:var(--muted)">Tomatometer · ${it[2]>=60?'Fresh':'Rotten'}</span>`:''}</span>
+      </div>
+      <div class="actions">
+        <button class="btn ${done?'':'primary'}" data-watch="${f.id}:${i}"><svg aria-hidden="true"><use href="#i-check"/></svg>${done?'Unmark watched':'Watched it'}</button>
+        ${pos>1?`<button class="btn mustard" data-through="${f.id}:${i}">Caught up through here</button>`:''}
+      </div>
+      <div class="links"><a href="https://www.rottentomatoes.com/search?search=${q}" target="_blank" rel="noopener">Rotten Tomatoes</a><a href="https://www.justwatch.com/us/search?q=${q}" target="_blank" rel="noopener">Where to stream</a><a href="https://en.wikipedia.org/wiki/${encodeURIComponent((it[4]||it[0]).replace(/ /g,'_'))}" target="_blank" rel="noopener">Wikipedia</a></div>
+    </div></div>`;
+  document.body.classList.add('sheet-open');buzz(6);
+  loadPosters(f,[i]);
+}
+function closeSheet(){document.body.classList.remove('sheet-open');sheetRef=null}
+
+/* ---------- actions ---------- */
+let toastT;
+function toast(msg,undo){const t=$('#toast');t.innerHTML=`<span>${esc(msg)}</span>${undo?'<button id="undo">Undo</button>':''}`;t.classList.add('show');clearTimeout(toastT);
+  if(undo)$('#undo').onclick=()=>{undo();t.classList.remove('show');buzz(10)};toastT=setTimeout(()=>t.classList.remove('show'),4000)}
+function snapshot(){return JSON.parse(JSON.stringify(watched))}
+function setWatched(f,i,on){watched[f.id]=watched[f.id]||{};if(on)watched[f.id][i]=1;else delete watched[f.id][i];if(!Object.keys(watched[f.id]).length)delete watched[f.id];store.set('catchup.watched',watched)}
+function toggle(fid,i){const f=byId[fid],before=snapshot(),on=!isDone(f,i);setWatched(f,i,on);buzz(on?[12,30,18]:12);
+  const el=document.querySelector(`.item[data-item="${i}"] .poster`);if(el&&view.fid===fid){el.classList.remove('squeeze');void el.offsetWidth;el.classList.add('squeeze')}
+  toast(on?'Marked watched':'Unmarked',()=>{watched=before;store.set('catchup.watched',watched);refresh()});
+  refresh()}
+function through(fid,i){const f=byId[fid],before=snapshot(),idx=order(f),pos=idx.indexOf(i);let n=0;
+  for(let k=0;k<=pos;k++){if(!isDone(f,idx[k])){setWatched(f,idx[k],true);n++}}
+  buzz([10,40,10,40,20]);closeSheet();toast(`Marked ${n} ${n===1?'title':'titles'} watched through ${f.items[i][0]}`,()=>{watched=before;store.set('catchup.watched',watched);refresh()});refresh()}
+function refresh(){stats();if(view.name==='library')renderLibrary();else renderFranchise(view.fid);if(sheetRef)openSheet(sheetRef.fid,sheetRef.i)}
+function stats(){$('#statN').textContent=F.reduce((n,f)=>n+doneCount(f),0)}
+
+document.addEventListener('click',e=>{
+  const t=e.target.closest('[data-open],[data-sheet],[data-watch],[data-through],[data-order],[data-kind],[data-tog],[data-sort]');if(!t)return;
+  if(t.dataset.open){go(t.dataset.open);return}
+  if(t.dataset.sheet){const[a,b]=t.dataset.sheet.split(':');openSheet(a,+b);return}
+  if(t.dataset.watch){const[a,b]=t.dataset.watch.split(':');toggle(a,+b);return}
+  if(t.dataset.through){const[a,b]=t.dataset.through.split(':');through(a,+b);return}
+  if(t.dataset.order){orderMode=t.dataset.order;store.set('catchup.order',orderMode);buzz(8);refresh();return}
+  if(t.dataset.kind){filters.kind=t.dataset.kind;store.set('catchup.filters',filters);buzz(8);refresh();return}
+  if(t.dataset.tog){filters[t.dataset.tog]=!filters[t.dataset.tog];store.set('catchup.filters',filters);buzz(8);refresh();return}
+  if(t.dataset.sort){librarySort=t.dataset.sort;store.set('catchup.sort',librarySort);buzz(8);refresh();return}
+});
+document.addEventListener('click',e=>{
+  if(e.target.closest('#shClose')||e.target===$('#scrim'))closeSheet();
+  if(e.target.closest('#back'))go('library');
+  if(e.target.closest('#copyProg'))copyProgress();
+  if(e.target.closest('#resetProg'))resetProgress();
+});
+document.addEventListener('keydown',e=>{
+  if(e.key==='Escape'){closeSheet();$('#results').classList.remove('open');return}
+  if(e.target.matches('input'))return;
+  if(view.name==='franchise'){const fi=F.indexOf(byId[view.fid]);if(e.key==='ArrowRight')go(F[(fi+1)%F.length].id);if(e.key==='ArrowLeft')go(F[(fi-1+F.length)%F.length].id)}
+});
+function copyProgress(){const lines=F.filter(f=>doneCount(f)>0).map(f=>{const nx=nextUp(f);return `${f.name}: ${doneCount(f)}/${f.items.length}${nx>=0?' · next: '+f.items[nx][0]:' · caught up'}`});
+  const text=lines.length?`Catchup — ${F.reduce((n,f)=>n+doneCount(f),0)} of ${TOTAL} titles\n`+lines.join('\n'):'Catchup — nothing marked yet';
+  const done=()=>toast('Progress copied');
+  try{navigator.clipboard.writeText(text).then(done).catch(()=>fallbackCopy(text,done))}catch(e){fallbackCopy(text,done)}}
+function fallbackCopy(text,done){const ta=document.createElement('textarea');ta.value=text;document.body.appendChild(ta);ta.select();try{document.execCommand('copy');done()}catch(e){toast('Select and copy from the box');return}ta.remove()}
+let resetArmed=false;
+function resetProgress(){if(!resetArmed){resetArmed=true;$('#resetProg').textContent='Tap again to erase all progress';setTimeout(()=>{resetArmed=false;const b=$('#resetProg');if(b)b.textContent='Reset'},3000);return}
+  const before=snapshot();watched={};store.set('catchup.watched',watched);resetArmed=false;buzz([20,40,20]);toast('Progress erased',()=>{watched=before;store.set('catchup.watched',watched);refresh()});refresh()}
+
+/* ---------- search ---------- */
+const q=$('#q'),results=$('#results'),sw=$('#searchWrap');let sel=-1;
+function search(){const s=q.value.trim().toLowerCase();sw.classList.toggle('has',!!s);sel=-1;
+  if(!s){results.classList.remove('open');q.setAttribute('aria-expanded','false');return}
+  const fr=F.filter(f=>f.name.toLowerCase().includes(s)).slice(0,6);
+  const ti=[];F.forEach(f=>f.items.forEach((it,i)=>{if(it[0].toLowerCase().includes(s))ti.push({f,i})}));
+  let h='';
+  if(fr.length)h+=`<div class="grp cap">Franchises</div>`+fr.map(f=>`<button data-open="${f.id}" role="option">${esc(f.name)}<span class="sub">${doneCount(f)}/${f.items.length}</span></button>`).join('');
+  if(ti.length)h+=`<div class="grp cap">Titles</div>`+ti.slice(0,10).map(({f,i})=>`<button data-sheet="${f.id}:${i}" role="option">${esc(f.items[i][0])}<span class="sub">${esc(f.name)} · #${order(f).indexOf(i)+1}</span></button>`).join('');
+  if(!h)h=`<div class="none">Nothing called “${esc(q.value.trim())}” here yet.</div>`;
+  results.innerHTML=h;results.classList.add('open');q.setAttribute('aria-expanded','true')}
+q.addEventListener('input',search);q.addEventListener('focus',search);
+q.addEventListener('keydown',e=>{const opts=[...results.querySelectorAll('button')];if(!opts.length)return;
+  if(e.key==='ArrowDown'){e.preventDefault();sel=(sel+1)%opts.length}else if(e.key==='ArrowUp'){e.preventDefault();sel=(sel-1+opts.length)%opts.length}else if(e.key==='Enter'){e.preventDefault();(opts[sel]||opts[0]).click();return}else return;
+  opts.forEach((o,i)=>o.classList.toggle('sel',i===sel));opts[sel].scrollIntoView({block:'nearest'})});
+$('#qClear').addEventListener('click',()=>{q.value='';search();q.focus()});
+document.addEventListener('click',e=>{if(!sw.contains(e.target))results.classList.remove('open')});
+results.addEventListener('click',()=>{results.classList.remove('open');q.value='';sw.classList.remove('has')});
+
+/* ---------- swipe between franchises (touch) ---------- */
+let sx=0,sy=0,sw0=false;
+const mainEl=$('#view');
+mainEl.addEventListener('touchstart',e=>{if(view.name!=='franchise'||document.body.classList.contains('sheet-open'))return;sx=e.touches[0].clientX;sy=e.touches[0].clientY;sw0=true},{passive:true});
+mainEl.addEventListener('touchend',e=>{if(!sw0)return;sw0=false;const dx=e.changedTouches[0].clientX-sx,dy=e.changedTouches[0].clientY-sy;
+  if(Math.abs(dx)>70&&Math.abs(dx)>Math.abs(dy)*1.6){const fi=F.indexOf(byId[view.fid]);go(F[(fi+(dx<0?1:-1)+F.length)%F.length].id)}},{passive:true});
+
+/* ---------- routing ---------- */
+function go(id,replace=false){
+  closeSheet();results.classList.remove('open');
+  if(id==='library'||!byId[id]){view={name:'library',fid:null};document.body.dataset.view='library';renderLibrary()}
+  else{view={name:'franchise',fid:id};document.body.dataset.view='franchise';renderFranchise(id)}
+  try{if(replace)history.replaceState(null,'','#'+(view.fid||'library'));else if(location.hash!=='#'+(view.fid||'library'))history.pushState(null,'','#'+(view.fid||'library'))}catch(e){}
+  window.scrollTo(0,0);
+}
+window.addEventListener('popstate',()=>{const id=(location.hash||'').slice(1);closeSheet();
+  if(id&&byId[id]){view={name:'franchise',fid:id};document.body.dataset.view='franchise';renderFranchise(id)}else{view={name:'library',fid:null};document.body.dataset.view='library';renderLibrary()}
+  window.scrollTo(0,0)});
+
+/* ---------- posters ----------
+   Wikipedia's page-summary API (CORS-open) gives each title's infobox poster. URLs are cached per device.
+   Where a host blocks outside images (the claude.ai artifact sandbox does), the typographic card stays. */
+const posterCache=store.get('catchup.posters',{});
+const key=it=>it[4]||it[0];
+const inflight=new Set();let queue=[],running=0;
+function loadPosters(f,idxs){
+  idxs.forEach(i=>{const it=f.items[i],k=key(it);if(posterCache[k]!==undefined||inflight.has(k))return;inflight.add(k);queue.push({f,i,k})});
+  pump();
+}
+function pump(){
+  while(running<6&&queue.length){const job=queue.shift();running++;
+    const ctl=new AbortController();const to=setTimeout(()=>ctl.abort(),9000);
+    fetch('https://en.wikipedia.org/api/rest_v1/page/summary/'+encodeURIComponent(job.k.replace(/ /g,'_')),{signal:ctl.signal,headers:{Accept:'application/json'}})
+      .then(r=>r.ok?r.json():null)
+      .then(j=>{const u=j&&j.thumbnail&&j.thumbnail.source?j.thumbnail.source.replace(/\/(\d+)px-/,'/500px-'):null;posterCache[job.k]=u;store.set('catchup.posters',posterCache);if(u)paint(job.f,job.i,u)})
+      .catch(()=>{})
+      .finally(()=>{clearTimeout(to);inflight.delete(job.k);running--;pump()});
+  }
+}
+function paint(f,i,u){
+  const img=new Image();img.alt='';img.onload=()=>{
+    document.querySelectorAll(`[data-sheet="${f.id}:${i}"], .sh .post`).forEach(el=>{
+      if(el.classList.contains('post')&&!(sheetRef&&sheetRef.fid===f.id&&sheetRef.i===i)&&!el.dataset.sheet)return;
+      const fb=el.querySelector('.fallback');if(fb){const c=img.cloneNode();fb.replaceWith(c)}});
+  };img.src=u;
+}
+
+/* ---------- boot ---------- */
+stats();
+const startId=(location.hash||'').slice(1);
+go(byId[startId]?startId:'library',true);
+</script>
+</body></html>
